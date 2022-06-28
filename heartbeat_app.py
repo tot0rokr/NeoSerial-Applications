@@ -45,3 +45,10 @@ def heartbeat_app(api, addresses):
             status = "bad"
 
         print(k[0], k[1], status)
+
+
+if __name__ == "__main__":
+    import sys
+    from runtime.mesh_api_client import MeshAPIClient
+    api = MeshAPIClient(('localhost', 5070))
+    heartbeat_app(api, sys.argv[1:])
