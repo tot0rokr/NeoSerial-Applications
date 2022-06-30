@@ -32,6 +32,7 @@ def heartbeat_app(api, addresses):
 
     # Gathering results
     receive_period_log = log2b(receive_period)
+    ret = dict()
     for k, v in result.items():
         if v is None:
             print(k[0], k[1], "disconnected")
@@ -44,8 +45,11 @@ def heartbeat_app(api, addresses):
         else:
             status = "bad"
 
-        print(k[0], k[1], status)
+        if k[0] not in ret:
+            ret[k[0]] = dict()
+        ret[k[0]][k[1]] = status
 
+    return ret
 
 if __name__ == "__main__":
     import sys
