@@ -53,6 +53,8 @@ def heartbeat_app(api, addresses):
 
 if __name__ == "__main__":
     import sys
-    from runtime.mesh_api_client import MeshAPIClient
-    api = MeshAPIClient(('localhost', 5070))
+    from event_proxy_client import EventProxyClient
+    from functools import partial
+    client = EventProxyClient(('localhost', 5080))
+    api = partial(client, 'api')
     heartbeat_app(api, sys.argv[1:])
