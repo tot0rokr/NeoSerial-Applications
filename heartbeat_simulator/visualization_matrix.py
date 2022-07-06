@@ -5,13 +5,15 @@ import sys
 
 from make_adjacency_matrix import make_matrix, change_list
 
-from find_optimal_relay import find_relaies, verify_relaies
+from find_optimal_relay import find_relaies, verify_relaies, erase_redundant_relaies
 
-NODE_NR = 15
-PROBABILITY = 50
-REPEATERS = 2
+NODE_NR = 20
+PROBABILITY = 30
+REPEATERS = 3
 
 if __name__ == "__main__":
+    plt.figure(figsize=(10, 10))
+
     mat = make_matrix(NODE_NR, PROBABILITY)
     adj = change_list(mat)
     print('-----------------------------------')
@@ -27,8 +29,21 @@ if __name__ == "__main__":
     verify_relaies(adj, relaies, REPEATERS)
     print ("relaies: ", relaies)
 
-    list(filter(lambda x: x in relaies, d))
     nx.draw_networkx_nodes(G, pos, nodelist=relaies, node_color="#FF1144")
+
+    if REPEATERS > 1:
+        erased_relaies = erase_redundant_relaies(adj, relaies, REPEATERS - 1)
+        verify_relaies(adj, relaies, REPEATERS - 1)
+        print ("relaies: ", relaies)
+
+        nx.draw_networkx_nodes(G, pos, nodelist=erased_relaies, node_color="#AA1144")
+
+    if REPEATERS > 2:
+        erased_relaies = erase_redundant_relaies(adj, relaies, REPEATERS - 2)
+        verify_relaies(adj, relaies, REPEATERS - 2)
+        print ("relaies: ", relaies)
+
+        nx.draw_networkx_nodes(G, pos, nodelist=erased_relaies, node_color="#441144")
 
     plt.axis('equal')
     file_name = "graph.png"

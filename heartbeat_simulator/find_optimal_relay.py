@@ -35,6 +35,59 @@ def find_relaies(adj, repeaters=1, capacity="TODO"):
 
     return relaies
 
+
+def erase_redundant_relaies(adj, relaies, repeaters=1):
+    def get_parent(parents, node):
+        if parents[node] == node:
+            return node
+        else:
+            parents[node] = get_parent(parents, parents[node])
+            return parents[node]
+    def union_parent(parents, a, b):
+        a = get_parent(parents, a)
+        b = get_parent(parents, b)
+        if a < b:
+            parents[b] = a
+        else:
+            parents[a] = b
+    sorted_relaies = sorted(relaies, key=lambda x: len(adj[x]))
+    erased_relaies = []
+    for target in sorted_relaies:
+        # Check that peripheral nodes don't need relay.
+        check_erase = True
+        for n in adj[target]:
+            if len(set(adj[n]) & set(relaies)) - 1 < repeaters:
+                check_erase = False
+                break
+        if not check_erase:
+            continue
+
+        # Check severed between networks
+        adj_relaies = {}
+        for r in relaies:
+            adj_relaies[r] = list(filter(lambda x: x in relaies and x != target, adj[r]))
+        del adj_relaies[target]
+
+        parents_relaies = dict(zip(relaies, relaies))
+        del parents_relaies[target]
+        for relay, nodes in adj_relaies.items():
+            for node in nodes:
+                union_parent(parents_relaies, relay, node)
+
+        for relay in adj_relaies.keys():
+            get_parent(parents_relaies, relay)
+
+        parents_relaies_list = list(parents_relaies.items())
+        if not len(list(filter(lambda x: x[1] == parents_relaies_list[0][1], parents_relaies_list))) == len(parents_relaies_list):
+            continue
+
+        # Erase target
+        erased_relaies.append(target)
+        relaies.remove(target)
+        sorted_relaies.remove(target)
+
+    return erased_relaies
+
 ## v1
 
 #  def find_relaies(adj, capacity="TODO"):
