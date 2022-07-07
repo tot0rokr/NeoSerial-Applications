@@ -91,6 +91,44 @@ def erase_redundant_relaies(adj, relaies, repeaters=1):
 
     return erased_relaies
 
+def add_essential_relaies(adj, relaies, repeaters=1):
+    copied = copy.deepcopy(adj)
+    connected = {}
+    group = set()
+
+    # Load existing relaies
+    for n in copied.keys():
+        connected[n] = 0
+    for r in relaies:
+        relay_connected = copied[r]
+        del copied[r]
+        for n in relay_connected:
+            group.add(n)
+            connected[n] += 1
+            if connected[n] >= min(repeaters, len(adj[n])):
+                for row in copied.values():
+                    if n in row:
+                        row.remove(n)
+
+    # Add new relaies
+    new_relaies = []
+    while len(list(filter(lambda x: len(copied[x]) > 0, copied.keys()))):
+        target = find_relay(copied, group)
+        relaies.append(target)
+        new_relaies.append(target)
+        target_connected = copied[target]
+        del copied[target]
+        for n in target_connected:
+            group.add(n)
+            connected[n] += 1
+            if connected[n] >= min(repeaters, len(adj[n])):
+                for row in copied.values():
+                    if n in row:
+                        row.remove(n)
+
+    return new_relaies
+
+
 ## v1
 
 #  def find_relaies(adj, capacity="TODO"):
