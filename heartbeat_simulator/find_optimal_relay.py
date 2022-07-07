@@ -22,13 +22,16 @@ def find_relaies(adj, repeaters=1, capacity="TODO"):
 
     while len(list(filter(lambda x: len(copied[x]) > 0, copied.keys()))):
         target = find_relay(copied, group)
+        # adj is clean or severed networks
+        if target is None:
+            return []
         relaies.append(target)
         target_connected = copied[target]
         del copied[target]
         for n in target_connected:
             group.add(n)
             connected[n] += 1
-            if connected[n] >= min(repeaters, len(adj[target])):
+            if connected[n] >= min(repeaters, len(adj[n])):
                 for row in copied.values():
                     if n in row:
                         row.remove(n)
@@ -112,12 +115,16 @@ def erase_redundant_relaies(adj, relaies, repeaters=1):
     #  return relaies
 
 def verify_relaies(adj, relaies, repeaters):
+    if len(relaies) == 0:
+        return True
     # Each nodes connect to enough repeaters
     relaies_set = set(relaies)
     for n in adj.keys():
         connected_repeaters = len(set(adj[n]) & relaies_set)
         if connected_repeaters < min(repeaters, len(adj[n])):
             print("%d is not completed" % n)
+            print("adj", adj[n], "relaies", relaies)
+            print("connected", connected_repeaters, "repeaters", repeaters, "len", len(adj[n]))
             return False
 
     # Repeaters connected to each other
