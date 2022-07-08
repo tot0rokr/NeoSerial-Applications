@@ -5,11 +5,15 @@ import sys
 
 from make_adjacency_matrix import make_matrix, change_list
 
-from find_optimal_relay import find_relaies, verify_relaies, erase_redundant_relaies, add_essential_relaies
+from find_optimal_relay import find_relaies
+from find_optimal_relay import verify_relaies
+from find_optimal_relay import erase_redundant_relaies
+from find_optimal_relay import add_essential_relaies
+from find_optimal_relay import erase_terminal_relaies
 
-NODE_NR = 20
+NODE_NR = 5
 PROBABILITY = 30
-REPEATERS = 1
+REPEATERS = 2
 
 __adj = {
     1: [2],
@@ -59,6 +63,9 @@ if __name__ == "__main__":
 
     nx.draw_networkx_nodes(G, pos, nodelist=relaies, node_color="#FF1144")
 
+
+
+
     #  if REPEATERS > 1:
         #  erased_relaies = erase_redundant_relaies(adj, relaies, REPEATERS - 1)
         #  verify_relaies(adj, relaies, REPEATERS - 1)
@@ -73,17 +80,29 @@ if __name__ == "__main__":
 
         #  nx.draw_networkx_nodes(G, pos, nodelist=erased_relaies, node_color="#441144")
 
-    new_relaies = add_essential_relaies(adj, relaies, REPEATERS + 1)
-    verify_relaies(adj, relaies, REPEATERS + 1)
+
+
+
+    #  new_relaies = add_essential_relaies(adj, relaies, REPEATERS + 1)
+    #  verify_relaies(adj, relaies, REPEATERS + 1)
+    #  print ("relaies: ", relaies)
+
+    #  nx.draw_networkx_nodes(G, pos, nodelist=new_relaies, node_color="#996699")
+
+    #  new_relaies = add_essential_relaies(adj, relaies, REPEATERS + 2)
+    #  verify_relaies(adj, relaies, REPEATERS + 2)
+    #  print ("relaies: ", relaies)
+
+    #  nx.draw_networkx_nodes(G, pos, nodelist=new_relaies, node_color="#EEBBEE")
+
+
+
+
+    erased_relaies = erase_terminal_relaies(adj, relaies)
+    verify_relaies(adj, relaies + erased_relaies, REPEATERS)
     print ("relaies: ", relaies)
 
-    nx.draw_networkx_nodes(G, pos, nodelist=new_relaies, node_color="#996699")
-
-    new_relaies = add_essential_relaies(adj, relaies, REPEATERS + 2)
-    verify_relaies(adj, relaies, REPEATERS + 2)
-    print ("relaies: ", relaies)
-
-    nx.draw_networkx_nodes(G, pos, nodelist=new_relaies, node_color="#EEBBEE")
+    nx.draw_networkx_nodes(G, pos, nodelist=erased_relaies, node_color="#1BD628")
 
     plt.axis('equal')
     file_name = "graph.png"

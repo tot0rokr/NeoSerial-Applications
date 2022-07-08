@@ -128,6 +128,30 @@ def add_essential_relaies(adj, relaies, repeaters=1):
 
     return new_relaies
 
+def erase_terminal_relaies(adj, relaies):
+    erased_relaies = []
+    copied_relaies = copy.deepcopy(relaies)
+    for target in copied_relaies:
+        check_erase = False
+        # Check terminal relay
+        if len(adj[target]) == 1:
+            check_erase = True
+
+        # Check triangle terminal relaies
+        if len(adj[target]) == 2:
+            neighbors_conn2 = list(filter(lambda x: len(adj[x]) == 2, adj[target]))
+            if len(neighbors_conn2) == 1:
+                if len(set(adj[neighbors_conn2[0]]) & set(adj[target])) == 1:
+                    check_erase = True
+
+        # Erase target
+        if check_erase:
+            erased_relaies.append(target)
+            relaies.remove(target)
+
+    return erased_relaies
+
+
 
 ## v1
 
