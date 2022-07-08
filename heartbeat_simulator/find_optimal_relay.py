@@ -87,7 +87,6 @@ def erase_redundant_relaies(adj, relaies, repeaters=1):
         # Erase target
         erased_relaies.append(target)
         relaies.remove(target)
-        sorted_relaies.remove(target)
 
     return erased_relaies
 
