@@ -1,6 +1,10 @@
 from make_adjacency_matrix import make_matrix, change_list
 
-from find_optimal_relay import find_relaies, verify_relaies, erase_redundant_relaies, add_essential_relaies
+from find_optimal_relay import find_relaies
+from find_optimal_relay import verify_relaies
+from find_optimal_relay import erase_redundant_relaies
+from find_optimal_relay import add_essential_relaies
+from find_optimal_relay import erase_terminal_relaies
 
 def status_check(status, adj, repeaters, relaies, prefix="error"):
     if not status:
@@ -55,6 +59,7 @@ if __name__ == "__main__":
                 for add_repeaters in range(REPEATERS_ADD):
                     test_count += 1
                     new_relaies = add_essential_relaies(adj, relaies, repeaters + add_repeaters + 1)
+                    relaies += new_relaies
                     status = verify_relaies(adj, relaies, repeaters + add_repeaters + 1)
                     if status_check(status, adj, repeaters + add_repeaters, relaies, "add"):
                         break
@@ -64,6 +69,7 @@ if __name__ == "__main__":
                 for erase_repeaters in range(min(REPEATERS_ERASE, repeaters + REPEATERS_ADD - 1)):
                     test_count += 1
                     erased_relaies = erase_redundant_relaies(adj, relaies, repeaters - erase_repeaters - 1)
+                    relaies = list(set(relaies) - set(erased_relaies))
                     status = verify_relaies(adj, relaies, repeaters - erase_repeaters - 1)
                     if status_check(status, adj, repeaters - erase_repeaters, relaies, "ers"):
                         break
@@ -74,6 +80,7 @@ if __name__ == "__main__":
                 for add_repeaters in range(REPEATERS_ADD):
                     test_count += 1
                     new_relaies = add_essential_relaies(adj, relaies, repeaters + add_repeaters + 1)
+                    relaies += new_relaies
                     status = verify_relaies(adj, relaies, repeaters + add_repeaters + 1)
                     if status_check(status, adj, repeaters + add_repeaters, relaies, "agn"):
                         break

@@ -53,13 +53,15 @@ def erase_redundant_relaies(adj, relaies, repeaters=1):
             parents[b] = a
         else:
             parents[a] = b
-    sorted_relaies = sorted(relaies, key=lambda x: len(adj[x]))
+
+    copied_relaies = copy.deepcopy(relaies)
+    sorted_relaies = sorted(copied_relaies, key=lambda x: len(adj[x]))
     erased_relaies = []
     for target in sorted_relaies:
         # Check that peripheral nodes don't need relay.
         check_erase = True
         for n in adj[target]:
-            if len(set(adj[n]) & set(relaies)) - 1 < repeaters:
+            if len(set(adj[n]) & set(copied_relaies)) - 1 < repeaters:
                 check_erase = False
                 break
         if not check_erase:
@@ -67,11 +69,11 @@ def erase_redundant_relaies(adj, relaies, repeaters=1):
 
         # Check severed between networks
         adj_relaies = {}
-        for r in relaies:
-            adj_relaies[r] = list(filter(lambda x: x in relaies and x != target, adj[r]))
+        for r in copied_relaies:
+            adj_relaies[r] = list(filter(lambda x: x in copied_relaies and x != target, adj[r]))
         del adj_relaies[target]
 
-        parents_relaies = dict(zip(relaies, relaies))
+        parents_relaies = dict(zip(copied_relaies, copied_relaies))
         del parents_relaies[target]
         for relay, nodes in adj_relaies.items():
             for node in nodes:
@@ -86,7 +88,7 @@ def erase_redundant_relaies(adj, relaies, repeaters=1):
 
         # Erase target
         erased_relaies.append(target)
-        relaies.remove(target)
+        copied_relaies.remove(target)
 
     return erased_relaies
 
@@ -113,7 +115,6 @@ def add_essential_relaies(adj, relaies, repeaters=1):
     new_relaies = []
     while len(list(filter(lambda x: len(copied[x]) > 0, copied.keys()))):
         target = find_relay(copied, group)
-        relaies.append(target)
         new_relaies.append(target)
         target_connected = copied[target]
         del copied[target]
@@ -129,8 +130,7 @@ def add_essential_relaies(adj, relaies, repeaters=1):
 
 def erase_terminal_relaies(adj, relaies):
     erased_relaies = []
-    copied_relaies = copy.deepcopy(relaies)
-    for target in copied_relaies:
+    for target in relaies:
         check_erase = False
         # Check terminal relay
         if len(adj[target]) == 1:
@@ -146,7 +146,6 @@ def erase_terminal_relaies(adj, relaies):
         # Erase target
         if check_erase:
             erased_relaies.append(target)
-            relaies.remove(target)
 
     return erased_relaies
 
