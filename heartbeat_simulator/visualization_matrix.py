@@ -11,9 +11,13 @@ from find_optimal_relay import erase_redundant_relaies
 from find_optimal_relay import add_essential_relaies
 from find_optimal_relay import erase_terminal_relaies
 
-NODE_NR = 5
-PROBABILITY = 30
-REPEATERS = 2
+import random
+
+NODE_NR = 50
+PROBABILITY = 40
+REPEATERS = 10
+ERASE = 9
+ADD = 5
 
 __adj = {
     1: [2],
@@ -58,51 +62,33 @@ if __name__ == "__main__":
     nx.draw(G, pos=pos, nodelist=d.keys(), with_labels=True)
 
     relaies = find_relaies(adj, REPEATERS)
-    verify_relaies(adj, relaies, REPEATERS)
     print ("relaies: ", relaies)
+    verify_relaies(adj, relaies, REPEATERS)
 
     nx.draw_networkx_nodes(G, pos, nodelist=relaies, node_color="#FF1144")
 
+    for i in range(1, min(REPEATERS, ERASE)):
+        erased_relaies = erase_redundant_relaies(adj, relaies, REPEATERS - i)
+        relaies = list(set(relaies) - set(erased_relaies))
+        print ("relaies: ", relaies)
+        verify_relaies(adj, relaies, REPEATERS - i)
+        color = "#%06X" % random.randint(1, 0xFFFFFF)
+        nx.draw_networkx_nodes(G, pos, nodelist=erased_relaies, node_color=color)
 
-
-
-    #  if REPEATERS > 1:
-        #  erased_relaies = erase_redundant_relaies(adj, relaies, REPEATERS - 1)
-        #  verify_relaies(adj, relaies, REPEATERS - 1)
-        #  print ("relaies: ", relaies)
-
-        #  nx.draw_networkx_nodes(G, pos, nodelist=erased_relaies, node_color="#AA1144")
-
-    #  if REPEATERS > 2:
-        #  erased_relaies = erase_redundant_relaies(adj, relaies, REPEATERS - 2)
-        #  verify_relaies(adj, relaies, REPEATERS - 2)
-        #  print ("relaies: ", relaies)
-
-        #  nx.draw_networkx_nodes(G, pos, nodelist=erased_relaies, node_color="#441144")
-
-
-
-
-    #  new_relaies = add_essential_relaies(adj, relaies, REPEATERS + 1)
-    #  verify_relaies(adj, relaies, REPEATERS + 1)
-    #  print ("relaies: ", relaies)
-
-    #  nx.draw_networkx_nodes(G, pos, nodelist=new_relaies, node_color="#996699")
-
-    #  new_relaies = add_essential_relaies(adj, relaies, REPEATERS + 2)
-    #  verify_relaies(adj, relaies, REPEATERS + 2)
-    #  print ("relaies: ", relaies)
-
-    #  nx.draw_networkx_nodes(G, pos, nodelist=new_relaies, node_color="#EEBBEE")
-
-
-
+    for i in range(1, ADD):
+        new_relaies = add_essential_relaies(adj, relaies, REPEATERS + i - min(REPEATERS, ERASE) + 1)
+        relaies += new_relaies
+        print ("relaies: ", relaies)
+        verify_relaies(adj, relaies, REPEATERS + i - min(REPEATERS, ERASE) + 1)
+        color = "#%06X" % random.randint(1, 0xFFFFFF)
+        nx.draw_networkx_nodes(G, pos, nodelist=new_relaies, node_color=color)
 
     erased_relaies = erase_terminal_relaies(adj, relaies)
-    verify_relaies(adj, relaies + erased_relaies, REPEATERS)
+    relaies = list(set(relaies) - set(erased_relaies))
     print ("relaies: ", relaies)
-
-    nx.draw_networkx_nodes(G, pos, nodelist=erased_relaies, node_color="#1BD628")
+    verify_relaies(adj, relaies + erased_relaies, REPEATERS - min(REPEATERS, ERASE) + ADD)
+    color = "#%06X" % random.randint(1, 0xFFFFFF)
+    nx.draw_networkx_nodes(G, pos, nodelist=erased_relaies, node_color=color)
 
     plt.axis('equal')
     file_name = "graph.png"
